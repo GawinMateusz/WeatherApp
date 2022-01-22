@@ -32,5 +32,4 @@ public class LocationRepositoryImpl implements LocationRepository {
         return locations;
     }
 
-
 }

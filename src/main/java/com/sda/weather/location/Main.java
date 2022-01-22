@@ -20,12 +20,10 @@ public class Main {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         LocationRepositoryImpl locationRepositoryImpl = new LocationRepositoryImpl(sessionFactory);
-        LocationService locationService = new LocationService(locationRepositoryImpl);
+        LocationService locationService = new LocationService(locationRepositoryImpl, objectMapper);
         LocationController locationController = new LocationController(objectMapper, locationService);
 
         UserInterface userInterface = new UserInterface(locationController);
         userInterface.run();
-
-
     }
 }

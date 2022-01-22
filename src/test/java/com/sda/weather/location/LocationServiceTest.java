@@ -1,5 +1,7 @@
 package com.sda.weather.location;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +14,10 @@ public class LocationServiceTest {
 
     @BeforeEach
     void setUp() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         LocationRepositoryMock locationRepository = new LocationRepositoryMock();
-        locationService = new LocationService(locationRepository);
+        locationService = new LocationService(locationRepository, objectMapper);
     }
 
     @Test

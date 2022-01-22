@@ -15,4 +15,5 @@ public class LocationRepositoryMock implements LocationRepository {
     public List<Location> findAll() {
         return Collections.emptyList();
     }
+
 }

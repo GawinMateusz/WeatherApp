@@ -3,12 +3,15 @@ package com.sda.weather.frontend;
 import com.sda.weather.location.LocationController;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 @RequiredArgsConstructor
 public class UserInterface {
 
     private final LocationController locationController;
+    private Scanner scanner = new Scanner(System.in);
 
     public void run() {
         System.out.println("Aplikacja jest uruchomiona\n");
@@ -16,7 +19,7 @@ public class UserInterface {
         while (true) {
             System.out.println("Witaj w aplikacji pogody, co chcesz zrobić?");
             System.out.println("1. Dodać nową lokalizację");
-            System.out.println("2. Wyśtwietlić lokalizacje");
+            System.out.println("2. Wyświetlić lokalizacje");
             System.out.println("3. Pobrać informacje pogodowe");
             System.out.println("0. Wyjść z aplikacji");
 
@@ -39,16 +42,37 @@ public class UserInterface {
     }
 
     private void getWeatherInfo() {
-        System.out.println("Pobranie informacji pogodowych - praca nad utworzeniem funkjonalnośći trwa!");
+        System.out.println("Wpisz numer lokalizacji dla której chcesz wybrać pogodę: ");
+        for (int i = 0; i < locationController.getAllLocations().size(); i++) {
+            System.out.println(i + 1 + " : " + locationController.getAllLocations().get(i).getCityName()
+                    + ", Współrzędne:\nSzerokość: " + locationController.getAllLocations().get(i).getLatitude()
+                    + "\nDługość: " + locationController.getAllLocations().get(i).getLongitude());
+        }
+        System.out.println("Jeśli Twojej lokalizacji brak na liście wpisz 0, aby cofnąć i dodaj lokalizację!");
+        int locationNumber = scanner.nextInt();
+        if (locationNumber == 0) {
+            this.run();
+            return;
+        }
+        System.out.println("Wybierz dzień dla którego należy wyświetlić pogodę: ");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate dateTime = LocalDate.now();
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i + 1 + " : " + dateTime.format(dtf));
+            dateTime = dateTime.plusDays(1);
+        }
+        int dayToCheckWeather = scanner.nextInt();
+        LocalDate finaldate = LocalDate.now().plusDays(dayToCheckWeather - 1);
+        String response = locationController.getWeather(locationNumber, finaldate);
+        System.out.println(response);
     }
 
     private void getAllLocalizations() {
-        String locations = locationController.getAllLocations();
+        String locations = locationController.getAllLocationsToString();
         System.out.println("Odpowiedź serwera: " + locations);
     }
 
     private void addLocalization() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Podaj nazwę nowej miejscowości: ");
         String cityName = scanner.nextLine();
         System.out.println("Podaj szerokość geograficzną [W przypadku minut kątowych użyj przecinka jako separatora: -90,0 -> E, 90,0 -> W]: ");
