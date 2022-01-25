@@ -1,16 +1,19 @@
 package com.sda.weather.frontend;
 
+import com.sda.weather.forecast.ForecastController;
 import com.sda.weather.location.LocationController;
+import com.sda.weather.location.LocationService;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
 @RequiredArgsConstructor
 public class UserInterface {
 
     private final LocationController locationController;
+    private final ForecastController forecastController;
     private Scanner scanner = new Scanner(System.in);
 
     public void run() {
@@ -33,7 +36,7 @@ public class UserInterface {
                     getAllLocalizations();
                     break;
                 case 3:
-                    getWeatherInfo();
+                    getForecast();
                     break;
                 case 0:
                     return;
@@ -41,10 +44,11 @@ public class UserInterface {
         }
     }
 
-    private void getWeatherInfo() {
+    private void getForecast() {
         System.out.println("Wpisz numer lokalizacji dla której chcesz wybrać pogodę: ");
         for (int i = 0; i < locationController.getAllLocations().size(); i++) {
-            System.out.println(i + 1 + " : " + locationController.getAllLocations().get(i).getCityName()
+            System.out.println(locationController.getAllLocations().get(i).getId() + " : "
+                    + locationController.getAllLocations().get(i).getCityName()
                     + ", Współrzędne:\nSzerokość: " + locationController.getAllLocations().get(i).getLatitude()
                     + "\nDługość: " + locationController.getAllLocations().get(i).getLongitude());
         }
@@ -55,15 +59,13 @@ public class UserInterface {
             return;
         }
         System.out.println("Wybierz dzień dla którego należy wyświetlić pogodę: ");
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate dateTime = LocalDate.now();
-        for (int i = 0; i < 5; i++) {
-            System.out.println(i + 1 + " : " + dateTime.format(dtf));
-            dateTime = dateTime.plusDays(1);
+        Instant date = Instant.now().truncatedTo(ChronoUnit.DAYS);
+        for (int i = 0; i < 7; i++) {
+            System.out.println(i + 1 + " : " + date);
+            date = date.plus(1, ChronoUnit.DAYS);
         }
-        int dayToCheckWeather = scanner.nextInt();
-        LocalDate finaldate = LocalDate.now().plusDays(dayToCheckWeather - 1);
-        String response = locationController.getWeather(locationNumber, finaldate);
+        int dayToCheckForecast = scanner.nextInt();
+        String response = forecastController.getForecast((long) locationNumber, dayToCheckForecast);
         System.out.println(response);
     }
 

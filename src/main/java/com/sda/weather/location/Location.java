@@ -19,6 +19,5 @@ public class Location {
     private double longitude;
     private String countryName;
     private String region;
-    private String locationKey;
 
 }

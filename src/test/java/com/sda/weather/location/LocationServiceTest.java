@@ -17,7 +17,7 @@ public class LocationServiceTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         LocationRepositoryMock locationRepository = new LocationRepositoryMock();
-        locationService = new LocationService(locationRepository, objectMapper);
+        locationService = new LocationService(locationRepository);
     }
 
     @Test

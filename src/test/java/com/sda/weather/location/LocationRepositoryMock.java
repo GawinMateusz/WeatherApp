@@ -2,6 +2,7 @@ package com.sda.weather.location;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class LocationRepositoryMock implements LocationRepository {
 
@@ -14,6 +15,11 @@ public class LocationRepositoryMock implements LocationRepository {
     @Override
     public List<Location> findAll() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Location> findById(Long id) {
+        return Optional.empty();
     }
 
 }

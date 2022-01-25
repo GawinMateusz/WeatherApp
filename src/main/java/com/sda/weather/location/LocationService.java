@@ -3,17 +3,13 @@ package com.sda.weather.location;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class LocationService {
 
     private final LocationRepository locationRepository;
-    private final ObjectMapper objectMapper;
 
     Location createLocation(String cityName, double latitude, double longitude, String countryName, String region) {
         validation(cityName, latitude, longitude, countryName);
@@ -25,23 +21,6 @@ public class LocationService {
         if (region != null && !region.isBlank()) {
             location.setRegion(region);
         }
-
-        try {
-            String url = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=16IU0srbC2lqT28A8ZQF7afShZFON3pN&q=" + latitude + "%2C" + longitude + "&language=pl-pl";
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(url))
-                    .build();
-
-            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            String responseBody = httpResponse.body();
-            LocationKeyDTO locationKeyDTO = objectMapper.readValue(responseBody, LocationKeyDTO.class);
-            location.setLocationKey(locationKeyDTO.getKey());
-        } catch (Exception ioException) {
-            throw new IllegalArgumentException("Komunikacja z serwerem zewnętrznym nie powiodła się");
-        }
-
         return locationRepository.save(location);
     }
 
@@ -50,25 +29,8 @@ public class LocationService {
     }
 
 
-    public WeatherInfo getWeather(int locationNumber) {
-        Location location = getAllLocations().get(locationNumber - 1);
-        String locationKey = location.getLocationKey();
-        WeatherInfo weatherInfo;
-        try {
-            String url = "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" + locationKey + "?apikey=16IU0srbC2lqT28A8ZQF7afShZFON3pN&language=pl-pl&metric=true";
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(url))
-                    .build();
-
-            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            String responseBody = httpResponse.body();
-            weatherInfo = objectMapper.readValue(responseBody, WeatherInfo.class);
-        } catch (Exception ioException) {
-            throw new IllegalArgumentException("Komunikacja z serwerem zewnętrznym nie powiodła się");
-        }
-        return weatherInfo;
+    public Optional<Location> getLocation(Long id) {
+        return locationRepository.findById(id);
     }
 
     private void validation(String cityName, double latitude, double longitude, String countryName) {

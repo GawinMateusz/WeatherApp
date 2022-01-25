@@ -3,12 +3,8 @@ package com.sda.weather.location;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sda.weather.location.Weather.DailyForecast;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,30 +43,7 @@ public class LocationController {
     }
 
     public List<Location> getAllLocations() {
-        return locationService.getAllLocations();
-    }
-
-    public String getWeather(int locationNumber, LocalDate parsedDate) {
-        String respond;
-        ArrayList<DailyForecast> dailyForecasts = locationService.getWeather(locationNumber).dailyForecasts;
-        for (DailyForecast dailyForecast : dailyForecasts) {
-            LocalDate localDate = dailyForecast.getDate().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-            if (localDate.compareTo(parsedDate) == 0) {
-                respond = String.format("{\"date\":\"%s\"," +
-                                "\"MAXTemp\":\"%s\"," +
-                                "\"MINTemp\":\"%s\"," +
-                                "\"zachmurzenie/opady\":\"%s\"}",
-                        dailyForecast.date,
-                        dailyForecast.temperature.maximum.value,
-                        dailyForecast.temperature.minimum.value,
-                        dailyForecast.day.iconPhrase
-                );
-                return respond;
-            }
-        }
-        return null;
+            return locationService.getAllLocations();
     }
 
     private LocationDTO mapLocationToLocationDTO(Location newLocation) {

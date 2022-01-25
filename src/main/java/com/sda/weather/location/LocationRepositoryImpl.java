@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class LocationRepositoryImpl implements LocationRepository {
@@ -32,4 +34,13 @@ public class LocationRepositoryImpl implements LocationRepository {
         return locations;
     }
 
+    @Override
+    public Optional<Location> findById(Long id) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Optional<Location> location = Optional.of(session.createQuery("FROM Location WHERE id =?1", Location.class).setParameter(1, id).getSingleResult());
+        transaction.commit();
+        session.close();
+        return location;
+    }
 }
